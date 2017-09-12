@@ -23,7 +23,7 @@ function EXPORTS_ensure {
     fi
 
     # TODO: Use 'dec-to-op'
-    commands=$(BO_run_recent_node --eval '
+    BO_run_recent_node --eval '
         const PATH = require("path");
         const FS = require("fs");
         const config = require("codeblock").thawFromJSON(process.argv[2]);
@@ -64,7 +64,7 @@ function EXPORTS_ensure {
         replaceInPath(PATH.join(process.argv[1], "Info.plist"));
         replaceInPath(PATH.join(process.argv[1], "MacOS/launch"));
 
-    ' "${targetBaseDir}/Contents" "$1")
+    ' "${targetBaseDir}/Contents" "$1"
 }
 
 
@@ -72,6 +72,30 @@ function EXPORTS_ensureOnDesktop {
 
     EXPORTS_ensure "$1"
 
-    echo "ensure on desktop"
+    local targetBaseDir="$(pwd)/.rt/to.pinf.com.apple.osx.app~/launch.app"
+
+    targetPath=$(BO_run_recent_node --eval '
+        const PATH = require("path");
+        const FS = require("fs");
+        const config = require("codeblock").thawFromJSON(process.argv[1]);
+
+        if (!config.name) {
+            throw new Error("config.name must be set!");
+        }
+
+        process.stdout.write(PATH.join(process.env.HOME, "Desktop", config.name + ".app"));
+
+    ' "$1")
+
+    if [ ! -s "$targetPath" ]; then
+        if [ -e "$targetPath" ]; then
+            echo "ERROR: File already exists at '$targetPath'. Delete it first so we can symlink a new file."
+            exit 1
+        fi
+    fi
+
+    BO_log "$VERBOSE" "Linking '$targetBaseDir' to '$targetPath'"
+
+    ln -s "$targetBaseDir" "$targetPath"
 
 }

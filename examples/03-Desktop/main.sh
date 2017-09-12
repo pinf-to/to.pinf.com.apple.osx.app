@@ -4,8 +4,12 @@ depend {
     "app": "@com.github/pinf-to/to.pinf.com.apple.osx.app#s1"
 }
 
-CALL_app ensure {
-    "id": "to.pinf.com.apple.osx.app~01",
+
+rm -f "$HOME/Desktop/App.app" || true
+
+CALL_app ensureOnDesktop {
+    "id": "to.pinf.com.apple.osx.app~03",
+    "name": "App",
     "on": {
         "launch": (bash () >>>
 
@@ -15,10 +19,15 @@ CALL_app ensure {
     }
 }
 
+if [ ! -e "$HOME/Desktop/App.app" ]; then
+    echo "ERROR: No app shortcut detected!"
+    exit 1
+fi
+
 
 rm -f "$__DIRNAME__/.launched" || true
 
-open "$__DIRNAME__/.rt/to.pinf.com.apple.osx.app~/launch.app"
+open "$HOME/Desktop/App.app"
 
 sleep 1
 
@@ -27,6 +36,7 @@ if [ ! -e "$__DIRNAME__/.launched" ]; then
     exit 1
 fi
 rm -f "$__DIRNAME__/.launched" || true
+rm -f "$HOME/Desktop/App.app" || true
 
 
 echo "OK"
