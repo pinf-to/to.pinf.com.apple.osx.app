@@ -26,7 +26,7 @@ function EXPORTS_ensure {
     BO_run_recent_node --eval '
         const PATH = require("path");
         const FS = require("fs");
-        const config = require("codeblock").thawFromJSON(process.argv[2]);
+        const config = require(PATH.join("$__DIRNAME__", "node_modules/codeblock")).thawFromJSON(process.argv[2]);
 
         if (!config.id) {
             throw new Error("config.id must be set!");
@@ -70,14 +70,10 @@ function EXPORTS_ensure {
 
 function EXPORTS_ensureOnDesktop {
 
-    EXPORTS_ensure "$1"
-
-    local targetBaseDir="$(pwd)/.rt/to.pinf.com.apple.osx.app~/launch.app"
-
     targetPath=$(BO_run_recent_node --eval '
         const PATH = require("path");
         const FS = require("fs");
-        const config = require("codeblock").thawFromJSON(process.argv[1]);
+        const config = require(PATH.join("$__DIRNAME__", "node_modules/codeblock")).thawFromJSON(process.argv[1]);
 
         if (!config.name) {
             throw new Error("config.name must be set!");
@@ -92,7 +88,13 @@ function EXPORTS_ensureOnDesktop {
             echo "ERROR: File already exists at '$targetPath'. Delete it first so we can symlink a new file."
             exit 1
         fi
+    else
+        return 0
     fi
+
+    EXPORTS_ensure "$1"
+
+    local targetBaseDir="$(pwd)/.rt/to.pinf.com.apple.osx.app~/launch.app"
 
     BO_log "$VERBOSE" "Linking '$targetBaseDir' to '$targetPath'"
 
