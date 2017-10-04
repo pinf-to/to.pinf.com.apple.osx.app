@@ -11,14 +11,21 @@ function EXPORTS_ensure {
     mkdir -p "$(dirname "${targetBaseDir}")"
     cp -Rf "${tplBaseDir}/launch.app" "${targetBaseDir}"
 
+
+    iconPath=$(BO_run_recent_node --eval '
+        const PATH = require("path");
+        const config = JSON.parse(process.argv[1]);
+        process.stdout.write(config.iconPath || PATH.join("'${tplBaseDir}'", "icon.png"));
+    ' "$1")
+
     if [ -z "$VERBOSE" ]; then
         "$__DIRNAME__/node_modules/.bin/nicns" \
-            --in "${tplBaseDir}/icon.png" \
+            --in "${iconPath}" \
             --out "${targetBaseDir}/Contents/Resources/launchIcon.icns" \
             > /dev/null
     else
         "$__DIRNAME__/node_modules/.bin/nicns" \
-            --in "${tplBaseDir}/icon.png" \
+            --in "${iconPath}" \
             --out "${targetBaseDir}/Contents/Resources/launchIcon.icns"
     fi
 
