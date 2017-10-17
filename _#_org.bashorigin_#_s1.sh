@@ -71,6 +71,7 @@ function EXPORTS_ensure {
 
             code = code.replace(/%%ID%%/g, config.id);
             code = code.replace(/%%COMMANDS%%/g, commands);
+            code = code.replace(/%%BO_ROOT_SCRIPT_PATH%%/g, process.env.BO_ROOT_SCRIPT_PATH || "\$HOME/.bash.origin");
 
             FS.writeFileSync(path, code, "utf8");
         }
