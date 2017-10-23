@@ -25,16 +25,39 @@ function EXPORTS_ensure {
         process.stdout.write(config.iconPath || PATH.join("'${tplBaseDir}'", "icon.png"));
     ' "$1")
 
-    if [ -z "$VERBOSE" ]; then
-        "$__DIRNAME__/node_modules/.bin/nicns" \
-            --in "${iconPath}" \
-            --out "${targetBaseDir}/Contents/Resources/launchIcon.icns" \
-            > /dev/null
-    else
-        "$__DIRNAME__/node_modules/.bin/nicns" \
-            --in "${iconPath}" \
-            --out "${targetBaseDir}/Contents/Resources/launchIcon.icns"
-    fi
+
+    function makeICNS {
+        __sourcePath="$1"
+        __targetPath="$2"
+        if [ ! -e "$(dirname __targetPath)" ]; then
+            mkdir -p "$(dirname __targetPath)"
+        fi
+        rm -f "${__targetPath}" || true
+        __tmpPath="${__targetPath}.iconset"
+        rm -Rf "${__tmpPath}" || true
+        mkdir "${__tmpPath}"
+        if ! BO_has "sips"; then
+            BO_exit_error "'sips' command not found!"
+        fi
+        if ! BO_has "iconutil"; then
+            BO_exit_error "'iconutil' command not found!"
+        fi
+        sips -z 16 16 ${__sourcePath} --out "${__tmpPath}/icon_16x16.png" > /dev/null
+        sips -z 32 32 ${__sourcePath} --out "${__tmpPath}/icon_32x32.png" > /dev/null
+        sips -z 128 128 ${__sourcePath} --out "${__tmpPath}/icon_128x128.png" > /dev/null
+        sips -z 256 256 ${__sourcePath} --out "${__tmpPath}/icon_256x256.png" > /dev/null
+        sips -z 512 512 ${__sourcePath} --out "${__tmpPath}/icon_512x512.png" > /dev/null
+        sips -z 32 32 ${__sourcePath} --out "${__tmpPath}/icon_16x16@2x.png" > /dev/null
+        sips -z 64 64 ${__sourcePath} --out "${__tmpPath}/icon_32x32@2x.png" > /dev/null
+        sips -z 256 256 ${__sourcePath} --out "${__tmpPath}/icon_128x128@2x.png" > /dev/null
+        sips -z 512 512 ${__sourcePath} --out "${__tmpPath}/icon_256x256@2x.png" > /dev/null
+        sips -z 1024 1024 ${__sourcePath} --out "${__tmpPath}/icon_512x512@2x.png" > /dev/null
+        iconutil -c icns "${__tmpPath}" -o "${__targetPath}" > /dev/null
+        rm -Rf "${__tmpPath}"
+    }
+
+    makeICNS "${iconPath}" "${targetBaseDir}/Contents/Resources/launchIcon.icns"
+
 
     # TODO: Use 'dec-to-op'
     BO_run_recent_node --eval '

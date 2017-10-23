@@ -1,11 +1,10 @@
 {
   "name": "github.com~pinf-to~to.pinf.com.apple.osx.app",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dependencies": {
     "bash.origin": "^0.1.61",
     "bash.origin.test": "^0.1.33",
-    "codeblock": "^0.3.4",
-    "node-icns": "github:typefoo/node-icns"
+    "codeblock": "^0.3.4"
   },
   "scripts": {
     "test": "BO_ROOT_SCRIPT_PATH=$(pwd)/node_modules/bash.origin/bash.origin bash.origin.test examples"
